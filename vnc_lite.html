@@ -41,14 +41,18 @@
         #status {
             text-align: center;
         }
-        #sendCtrlAltDelButton {
+        #sendCtrlAltDelButton, #sendClipboardButton {
             position: fixed;
             top: 0px;
-            right: 0px;
             border: 1px outset;
             padding: 5px 5px 4px 5px;
+            width: 100px;
             cursor: pointer;
         }
+
+        #sendCtrlAltDelButton { right: 0px; }
+        #sendClipboardButton { right: 120px; }
+
 
         #screen {
             flex: 1; /* fill remaining space */
@@ -131,9 +135,28 @@
 
             return defaultValue;
         }
+       
 
-        document.getElementById('sendCtrlAltDelButton')
-            .onclick = sendCtrlAltDel;
+        function sendClipboard(){
+              var t = prompt("Enter text to be sent to console, Enters are not sent.");
+              
+              if(t){
+                   t = t.split("");
+                   while(t.length) { 
+                         var ch = t.shift(); 
+                         var c = ch.charCodeAt(); 
+                         
+                         var need_shift = ch.match(/[A-Z!@#$%^&*()_+{}:\"<>?~|]/); 
+                         if(need_shift) rfb.sendKey(65505,null,1)
+                         rfb.sendKey(c);
+                         console.log(c,need_shift);
+                         if(need_shift) rfb.sendKey(65505,null,0)
+                  }
+              }
+        }
+
+        document.getElementById('sendCtrlAltDelButton').onclick = sendCtrlAltDel;
+        document.getElementById('sendClipboardButton').onclick = ()=>{setTimeout(sendClipboard,100)};
 
         // Read parameters specified in the URL query string
         // By default, use the host and port of server that served this file
@@ -180,6 +203,7 @@
 <body>
     <div id="top_bar">
         <div id="status">Loading</div>
+        <div id="sendClipboardButton">Send Clipboard</div>
         <div id="sendCtrlAltDelButton">Send CtrlAltDel</div>
     </div>
     <div id="screen">
